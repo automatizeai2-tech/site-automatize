@@ -1,0 +1,6 @@
+node_modules/
+mundo/node_modules
+mundo/out/
+mundo/tmp/
+scrollcraft/lab/
+.DS_Store

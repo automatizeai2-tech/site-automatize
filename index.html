@@ -1,0 +1,549 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Automatize.AI · IA que atende o WhatsApp do seu negócio</title>
+<meta name="description" content="Agente de IA que atende o WhatsApp do seu negócio 24h: responde, qualifica e agenda clientes, para sua equipe ter tempo para o que só os humanos fazem.">
+<meta property="og:title" content="Automatize.AI · IA que atende o WhatsApp do seu negócio">
+<meta property="og:description" content="Responde, qualifica e agenda enquanto sua equipe cuida das pessoas. Entrega em até 3 dias úteis e 7 dias de teste grátis.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="assets/og.png">
+<meta name="theme-color" content="#EDF2F8">
+<link rel="icon" href="assets/simbolo.svg" type="image/svg+xml">
+<link rel="preload" href="assets/fonts/Sora-700.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/Inter-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="scrollcraft.css">
+<style>
+  @font-face { font-family: "Sora"; src: url("assets/fonts/Sora-700.woff2") format("woff2"); font-weight: 700; font-display: swap; }
+  @font-face { font-family: "Sora"; src: url("assets/fonts/Sora-600.woff2") format("woff2"); font-weight: 600; font-display: swap; }
+  @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-400.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+  @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-600.woff2") format("woff2"); font-weight: 600; font-display: swap; }
+
+  /* Brand Book Automatize.AI, modo claro: seis papéis e duas fontes. */
+  :root {
+    --sc-canvas:     #EDF2F8;
+    --sc-surface:    #FFFFFF;
+    --sc-ink:        #0E2A45;
+    --sc-ink-soft:   #5B748E;
+    --sc-accent:     #007CA5;
+    --sc-accent-ink: #FFFFFF;
+    --sc-font-display: "Sora", system-ui, sans-serif;
+    --sc-font-text:    "Inter", system-ui, sans-serif;
+    --sc-font-mono:    "Inter", system-ui, sans-serif;
+    --sc-shadow-color: 210 50% 12%;
+    --marinho: #0E2A45; --oceano: #007CA5; --teal: #1F949B; --ciano: #00C2E0;
+    --nevoa: #EDF2F8; --bruma: #A9BCCF; --ardosia: #5B748E; --noite: #07121E;
+    --verde-zap: #DCF8C6;
+  }
+  html { scroll-behavior: auto; }
+  body { color: var(--sc-ink); }
+  ::selection { background: rgba(0,194,224,0.35); }
+
+  /* ---- o mapa (navegação) -------------------------------------------- */
+  .mapa {
+    position: fixed; inset: 0 auto 0 0; z-index: var(--sc-z-chrome);
+    display: flex; flex-direction: column; justify-content: flex-start;
+    padding: clamp(1rem, 2.4vw, 2rem) clamp(1rem, 2.4vw, 2rem);
+    pointer-events: none;
+  }
+  .mapa > * { pointer-events: auto; }
+  .mapa nav { margin: auto 0; }
+  .marca { display: inline-flex; align-items: center; }
+  .marca img { height: clamp(2.2rem, 3.2vw, 2.9rem); width: auto; display: block; }
+  .rota { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; }
+  .rota button {
+    appearance: none; background: none; border: 0; padding: 0.3rem 0.25rem; margin: 0;
+    font: 600 var(--sc-t-xs)/1.2 var(--sc-font-text); letter-spacing: var(--sc-track-wide); text-transform: uppercase;
+    color: var(--sc-ink-soft); cursor: pointer; display: flex; align-items: center; gap: 0.7rem;
+    transition: color var(--sc-d-fast) var(--sc-ease-out);
+  }
+  .rota button::before {
+    content: ""; width: 0.55rem; height: 0.55rem; border-radius: 999px; flex: none;
+    border: 1.5px solid var(--sc-ink-soft); background: transparent;
+    transition: background var(--sc-d-fast) var(--sc-ease-out), transform var(--sc-d-fast) var(--sc-ease-out);
+  }
+  .rota button[aria-current="true"] { color: var(--sc-ink); }
+  .rota button[aria-current="true"]::before { background: var(--oceano); border-color: var(--oceano); transform: scale(1.25); }
+  .rota button:hover { color: var(--sc-ink); }
+  .rota button:focus-visible { outline: 2px solid var(--oceano); outline-offset: 3px; border-radius: 4px; }
+  .rota__nome { display: inline-block; }
+
+  /* ---- texto sobre o mundo ------------------------------------------- */
+  /* Uma forma de scrim só, a faixa de baixo, mais densa que o padrão porque o
+     mundo é claro e os cartões em Oceano passam por baixo dos títulos. */
+  .sc-world__scrim.sc-scrim--band {
+    background: linear-gradient(to top,
+      rgba(237,242,248,0.97) 0%, rgba(237,242,248,0.9) 30%, rgba(237,242,248,0.62) 52%, rgba(237,242,248,0) 72%);
+  }
+  .sc-world__copy { font-family: var(--sc-font-text); }
+  .copy { padding: 0; }
+  .copy h1, .copy h2 { font-family: var(--sc-font-display); font-weight: 700; color: var(--sc-ink); text-wrap: balance; margin: 0; letter-spacing: var(--sc-track-tight); }
+  .copy h1 { font-size: var(--sc-t-3xl); line-height: var(--sc-leading-none); }
+  .copy h2 { font-size: var(--sc-t-2xl); line-height: var(--sc-leading-tight); }
+  .copy p { margin: 0; color: var(--sc-ink-soft); font-size: var(--sc-t-lg); line-height: 1.5; text-wrap: pretty; }
+  .copy .miudo { font-size: var(--sc-t-sm); color: var(--sc-ink-soft); }
+  .copy > * + * { margin-top: var(--sc-5); }
+
+  .cta {
+    display: inline-flex; align-items: center; gap: 0.6rem;
+    background: var(--oceano); color: #fff; text-decoration: none;
+    font: 600 var(--sc-t-base)/1 var(--sc-font-text);
+    padding: 1rem 1.4rem; border-radius: var(--sc-r-md);
+    box-shadow: var(--sc-e2), var(--sc-edge);
+    transition: transform var(--sc-d-fast) var(--sc-ease-out), background var(--sc-d-fast) var(--sc-ease-out);
+    white-space: nowrap;
+  }
+  .cta:hover { background: #006a8d; transform: translateY(-1px); }
+  .cta:active { transform: translateY(1px) scale(0.98); }
+  .cta:focus-visible { outline: 2px solid var(--marinho); outline-offset: 3px; }
+  .cta svg { width: 1.1em; height: 1.1em; }
+
+  /* hero: ancorado à esquerda, embaixo */
+  /* o mapa ocupa a coluna da esquerda; o texto começa depois dele */
+  :root { --mapa: clamp(12rem, 15vw, 17rem); }
+  .sc-world__copy .sc-copy--lead { left: var(--mapa); }
+  .copy--hero { max-width: min(40rem, 44vw); }
+  .copy--hero h1 { font-size: clamp(2.4rem, 1.4rem + 3.1vw, 4.1rem); }
+  /* resultados: uma linha de quatro números, embaixo */
+  .copy--resultados { inset-inline: var(--mapa) var(--sc-gutter); bottom: clamp(2.5rem, 9vh, 7rem); max-width: none; }
+  .copy--resultados h2, .copy--passos h2 { max-width: 68%; }
+  .numeros { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(1rem, 3vw, 3rem); margin-top: var(--sc-6); }
+  .numeros > div { border-top: 1px solid var(--sc-hairline-strong); padding-top: var(--sc-4); }
+  .numero { font: 700 var(--sc-t-2xl)/1 var(--sc-font-display); color: var(--oceano); letter-spacing: var(--sc-track-snug); font-variant-numeric: tabular-nums; white-space: nowrap; display: flex; flex-direction: column; justify-content: flex-end; min-height: 1.7em; }
+  .numero b { font-weight: inherit; display: block; }
+  .numero small { font-size: 0.5em; color: var(--sc-ink-soft); font-weight: 600; letter-spacing: 0; line-height: 1.2; }
+  .numeros .oque { display: block; margin-top: var(--sc-2); color: var(--sc-ink); font-size: var(--sc-t-base); font-weight: 600; }
+  .numeros .quem { display: block; margin-top: var(--sc-1); color: var(--sc-ink-soft); font-size: var(--sc-t-sm); }
+  /* o que muda: uma folha branca no centro, lida como documento */
+  .copy--muda { inset-inline: auto; left: 50%; bottom: clamp(2.5rem, 9vh, 7rem); translate: -50% 0; max-width: min(52rem, 82vw); width: 100%; }
+  .folha { background: rgba(255,255,255,0.92); border-radius: var(--sc-r-lg); padding: clamp(1.25rem, 3vw, 2.5rem); box-shadow: var(--sc-e3), var(--sc-edge); }
+  .compara { width: 100%; border-collapse: collapse; margin-top: var(--sc-5); font-size: var(--sc-t-sm); }
+  .compara th, .compara td { text-align: left; padding: 0.7rem 0.6rem; border-top: 1px solid var(--sc-hairline); vertical-align: top; }
+  .compara thead th { border-top: 0; padding-top: 0; font: 600 var(--sc-t-xs)/1.3 var(--sc-font-text); letter-spacing: var(--sc-track-wide); text-transform: uppercase; color: var(--sc-ink-soft); }
+  .compara thead th.com { color: var(--oceano); }
+  .compara td:first-child { color: var(--sc-ink-soft); width: 22%; }
+  .compara td.sem { color: var(--sc-ink-soft); }
+  .compara td.com { color: var(--sc-ink); font-weight: 600; }
+  /* como funciona: quatro passos em linha, embaixo */
+  .copy--passos { inset-inline: var(--mapa) var(--sc-gutter); bottom: clamp(2.5rem, 9vh, 7rem); max-width: none; }
+  .passos { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(1rem, 3vw, 3rem); margin-top: var(--sc-6); counter-reset: passo; }
+  .passos > div { border-top: 1px solid var(--sc-hairline-strong); padding-top: var(--sc-4); counter-increment: passo; }
+  .passos h3 { font: 700 var(--sc-t-lg)/1.2 var(--sc-font-display); margin: 0 0 var(--sc-2); color: var(--sc-ink); letter-spacing: var(--sc-track-snug); }
+  .passos h3::before { content: counter(passo); display: inline-grid; place-items: center; width: 1.6em; height: 1.6em; border-radius: 999px; background: var(--oceano); color: #fff; font-size: 0.7em; margin-right: 0.6em; vertical-align: 0.15em; }
+  .passos p { font-size: var(--sc-t-sm); line-height: 1.55; }
+  .passos strong { color: var(--oceano); font-weight: 600; }
+  /* fechamento: texto à esquerda, embaixo; rodapé dentro */
+  .copy--fim { max-width: min(38rem, 50vw); }
+  .rodape { margin-top: var(--sc-7); padding-top: var(--sc-4); border-top: 1px solid var(--sc-hairline-strong); display: flex; flex-wrap: wrap; gap: 0.4rem 1.4rem; font-size: var(--sc-t-xs); color: var(--sc-ink-soft); }
+  .rodape a { color: var(--sc-ink-soft); text-decoration: underline; text-underline-offset: 0.2em; }
+  .rodape a:hover { color: var(--sc-ink); }
+
+  /* ---- o telefone que você conduz (movimento-assinatura) ---------------- */
+  .fone {
+    position: absolute; z-index: 21; pointer-events: none;
+    width: clamp(17rem, 21vw, 22rem); aspect-ratio: 9 / 18.6;
+    left: 0; top: 0;
+    transform-origin: 50% 50%;
+    will-change: transform, opacity;
+  }
+  .fone__corpo {
+    position: absolute; inset: 0; border-radius: 2.6rem;
+    background: var(--noite); padding: 0.55rem;
+    box-shadow: var(--sc-e3), inset 0 1px 0 rgba(255,255,255,0.25);
+  }
+  .fone__tela {
+    position: absolute; inset: 0.55rem; border-radius: 2.1rem; overflow: hidden;
+    background: #ECE5DD; display: flex; flex-direction: column;
+    font-family: var(--sc-font-text);
+  }
+  .fone__topo {
+    background: #075E54; color: #fff; padding: 1.4rem 0.9rem 0.7rem; display: flex; align-items: center; gap: 0.6rem; flex: none;
+  }
+  .fone__avatar { width: 1.9rem; height: 1.9rem; border-radius: 999px; background: var(--ciano); display: grid; place-items: center; flex: none; overflow: hidden; }
+  .fone__avatar img { width: 70%; height: 70%; object-fit: contain; }
+  .fone__nome { font-weight: 600; font-size: 0.86rem; line-height: 1.15; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .fone__status { font-size: 0.66rem; opacity: 0.85; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .fone__topo > div:last-child { min-width: 0; }
+  .fone__lista { flex: 1; padding: 0.7rem 0.6rem; display: flex; flex-direction: column; gap: 0.4rem; overflow: hidden; justify-content: flex-end; }
+  .msg {
+    max-width: 86%; padding: 0.45rem 0.6rem 0.35rem; border-radius: 0.7rem; font-size: 0.78rem; line-height: 1.35; color: #111b21;
+    background: #fff; box-shadow: 0 1px 1px rgba(0,0,0,0.08); position: relative;
+    opacity: 0; transform: translateY(8px) scale(0.98); transition: opacity 260ms var(--sc-ease-out), transform 320ms var(--sc-ease-out);
+  }
+  .msg.on { opacity: 1; transform: none; }
+  .msg--eles { align-self: flex-start; border-top-left-radius: 0.2rem; }
+  .msg--nos { align-self: flex-end; background: var(--verde-zap); border-top-right-radius: 0.2rem; }
+  .msg--sistema { align-self: center; background: #FFF5C4; color: #54470a; font-size: 0.68rem; text-align: center; max-width: 92%; border-radius: 0.5rem; }
+  .msg--sistema.msg--ok { background: #D7F5E3; color: #0f5132; }
+  .msg time { display: block; text-align: right; font-size: 0.6rem; color: #667781; margin-top: 0.15rem; }
+  .fone__input {
+    flex: none; display: flex; gap: 0.4rem; align-items: center; padding: 0.5rem 0.55rem 0.9rem; background: #F0F2F5;
+  }
+  .fone__campo {
+    flex: 1; background: #fff; border-radius: 999px; padding: 0.55rem 0.8rem; font-size: 0.74rem; color: #111b21; line-height: 1.3;
+    min-height: 2.1rem; display: flex; align-items: center;
+  }
+  .fone__campo.vazio { color: #8696a0; }
+  .fone__enviar {
+    width: 2.3rem; height: 2.3rem; border-radius: 999px; background: #25D366; display: grid; place-items: center; flex: none;
+    color: #fff; text-decoration: none; opacity: 0.45; transition: opacity var(--sc-d-fast) var(--sc-ease-out), transform var(--sc-d-fast) var(--sc-ease-out);
+  }
+  .fone__enviar svg { width: 1.1rem; height: 1.1rem; }
+  .fone.ativo { pointer-events: auto; }
+  .fone.ativo .fone__enviar { opacity: 1; }
+  .fone.ativo .fone__enviar:hover { transform: scale(1.06); }
+  .fone__enviar:focus-visible { outline: 2px solid var(--marinho); outline-offset: 3px; }
+  .fone__rotulo {
+    position: absolute; left: 50%; bottom: -1.9rem; translate: -50% 0; white-space: nowrap;
+    font: 400 var(--sc-t-xs)/1 var(--sc-font-text); color: var(--sc-ink-soft);
+  }
+  .fone__cta { display: none; }
+
+  /* ---- celular ----------------------------------------------------------- */
+  @media (max-width: 860px) {
+    .mapa { inset: 0 0 auto 0; flex-direction: row; align-items: center; justify-content: space-between; padding: 0.8rem 1rem; background: linear-gradient(to bottom, rgba(237,242,248,0.95), rgba(237,242,248,0)); }
+    .marca img { height: 2rem; }
+    .mapa nav { margin: 0; }
+    .rota { flex-direction: row; gap: 0.3rem; }
+    .rota button { padding: 0.5rem 0.25rem; gap: 0; }
+    .rota .rota__nome { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+    .rota button[aria-current="true"] .rota__nome { position: static; width: auto; height: auto; clip: auto; margin-left: 0.5rem; font-size: 0.68rem; }
+    .copy--hero, .copy--fim { max-width: none; }
+    .sc-world__copy .sc-copy--lead { left: var(--sc-gutter); }
+    .copy--resultados, .copy--passos { inset-inline: var(--sc-gutter); }
+    .copy--hero h1 { font-size: var(--sc-t-2xl); }
+    .copy--resultados h2, .copy--passos h2 { max-width: none; }
+    .copy h1 { font-size: var(--sc-t-2xl); }
+    .copy h2 { font-size: var(--sc-t-xl); }
+    .copy p { font-size: var(--sc-t-base); }
+    .copy > * + * { margin-top: var(--sc-4); }
+    .cta { white-space: normal; text-align: left; }
+    .numeros, .passos { grid-template-columns: 1fr 1fr; gap: 0.9rem 1.2rem; margin-top: var(--sc-4); }
+    .numero { font-size: clamp(1.5rem, 6.5vw, 2rem); }
+    .numeros .oque, .passos p { font-size: var(--sc-t-xs); }
+    .numeros .quem { display: none; }
+    .passos h3 { font-size: var(--sc-t-base); }
+    .passos p { line-height: 1.4; }
+    .copy--muda { max-width: none; inset-inline: var(--sc-gutter); left: auto; translate: none; width: auto; }
+    .folha { padding: 1rem; }
+    .compara { font-size: var(--sc-t-xs); }
+    .compara th, .compara td { padding: 0.45rem 0.3rem; }
+    .compara td:first-child { width: 26%; }
+    .fone { width: clamp(11rem, 44vw, 15rem); }
+    .fone__topo { padding: 0.9rem 0.7rem 0.5rem; }
+    .fone__nome { font-size: 0.72rem; }
+    .fone__status { font-size: 0.58rem; }
+    .msg { font-size: 0.66rem; }
+    .fone__campo { font-size: 0.62rem; }
+    .fone__rotulo { bottom: -1.5rem; }
+    .rodape { margin-top: var(--sc-5); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .msg { transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="mapa" aria-label="Mapa da página">
+  <a class="marca" href="#inicio" aria-label="Automatize.AI, voltar ao início">
+    <img src="assets/logo-claro.svg" alt="Automatize.AI" width="280" height="103">
+  </a>
+  <nav aria-label="Waypoints">
+    <ul class="rota">
+      <li><button type="button" data-perna="0" aria-current="true"><span class="rota__nome">A mensagem chega</span></button></li>
+      <li><button type="button" data-perna="1"><span class="rota__nome">Resultados reais</span></button></li>
+      <li><button type="button" data-perna="2"><span class="rota__nome">O que muda</span></button></li>
+      <li><button type="button" data-perna="3"><span class="rota__nome">Como funciona</span></button></li>
+      <li><button type="button" data-perna="4"><span class="rota__nome">Falar com a gente</span></button></li>
+    </ul>
+  </nav>
+</header>
+
+<main id="inicio" data-sc-mode="worldflight" data-sc-seam="0.16">
+
+  <div data-sc-world aria-hidden="true">
+    <div data-sc-segment data-sc-w="2.2" data-sc-waypoint="A mensagem chega">
+      <picture>
+        <source media="(max-width: 860px)" srcset="assets/perna1-m.webp">
+        <img class="sc-world__poster" src="assets/perna1.webp" alt="" decoding="async">
+      </picture>
+      <video data-sc-src="assets/perna1.mp4" data-sc-src-mobile="assets/perna1-m.mp4" muted playsinline></video>
+    </div>
+    <div data-sc-segment data-sc-w="3.08" data-sc-waypoint="Resultados reais">
+      <picture>
+        <source media="(max-width: 860px)" srcset="assets/perna2-m.webp">
+        <img class="sc-world__poster" src="assets/perna2.webp" alt="" decoding="async">
+      </picture>
+      <video data-sc-src="assets/perna2.mp4" data-sc-src-mobile="assets/perna2-m.mp4" muted playsinline></video>
+    </div>
+    <div data-sc-segment data-sc-w="2.2" data-sc-waypoint="O que muda">
+      <picture>
+        <source media="(max-width: 860px)" srcset="assets/perna3-m.webp">
+        <img class="sc-world__poster" src="assets/perna3.webp" alt="" decoding="async">
+      </picture>
+      <video data-sc-src="assets/perna3.mp4" data-sc-src-mobile="assets/perna3-m.mp4" muted playsinline></video>
+    </div>
+    <div data-sc-segment data-sc-w="2.2" data-sc-waypoint="Como funciona">
+      <picture>
+        <source media="(max-width: 860px)" srcset="assets/perna4-m.webp">
+        <img class="sc-world__poster" src="assets/perna4.webp" alt="" decoding="async">
+      </picture>
+      <video data-sc-src="assets/perna4.mp4" data-sc-src-mobile="assets/perna4-m.mp4" muted playsinline></video>
+    </div>
+    <div data-sc-segment data-sc-w="2.2" data-sc-waypoint="Falar com a gente">
+      <picture>
+        <source media="(max-width: 860px)" srcset="assets/perna5-m.webp">
+        <img class="sc-world__poster" src="assets/perna5.webp" alt="" decoding="async">
+      </picture>
+      <video data-sc-src="assets/perna5.mp4" data-sc-src-mobile="assets/perna5-m.mp4" muted playsinline></video>
+    </div>
+  </div>
+
+  <div data-sc-world-copy>
+    <div class="sc-world__scrim sc-scrim sc-scrim--band" aria-hidden="true"></div>
+
+    <section class="sc-copy sc-copy--lead copy copy--hero" data-sc-copy data-sc-window="hero" aria-labelledby="t-hero">
+      <h1 id="t-hero">IA que atende o WhatsApp do seu negócio, 24 horas.</h1>
+      <p>Responde, qualifica e agenda enquanto sua equipe cuida das pessoas.</p>
+      <p><a class="cta" href="https://wa.me/5581996188781?text=Quero%20saber%20como%20funciona%20no%20meu%20neg%C3%B3cio" target="_blank" rel="noopener">Quero saber como funciona no meu negócio
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a></p>
+    </section>
+
+    <section class="sc-copy copy copy--resultados" data-sc-copy data-sc-window="0.20 0.43 0.2 0.25" aria-labelledby="t-res">
+      <h2 id="t-res">Números de clientes que já usam o agente.</h2>
+      <div class="numeros">
+        <div><span class="numero"><b data-conta="229">0</b></span><span class="oque">agendamentos em quatro meses</span><span class="quem">Dra. Társila Gabrielle · odontologia · 1.046 leads, mai a ago/2026</span></div>
+        <div><span class="numero"><small>11,7% →</small><b><span data-conta="23,1">0,0</span>%</b></span><span class="oque">de conversão em agendamento</span><span class="quem">OdontoLuz · clínica odontológica · abr a ago/2026, agosto parcial</span></div>
+        <div><span class="numero"><b><span data-conta="69">0</span>h50</b></span><span class="oque">de atendimento manual economizadas</span><span class="quem">Studio Joseli Machado · estúdio de beleza · 1.794 leads, até 18/08/2026</span></div>
+        <div><span class="numero"><b data-conta="1.199">0</b></span><span class="oque">encaminhamentos para a unidade certa</span><span class="quem">Academia X1 Fitness · rede com 4 unidades · até 18/08/2026</span></div>
+      </div>
+      <p class="miudo">Dados de abril a agosto de 2026, divulgados com autorização dos clientes. Mais de 4.800 leads atendidos no total.</p>
+    </section>
+
+    <section class="sc-copy copy copy--muda" data-sc-copy data-sc-window="0.46 0.62 0.2 0.25" aria-labelledby="t-muda">
+      <div class="folha">
+        <h2 id="t-muda">O que muda no seu atendimento.</h2>
+        <table class="compara">
+          <thead><tr><th scope="col"><span class="sr">Critério</span></th><th scope="col">Só manual</th><th scope="col" class="com">Com o Gestor de Atendimento</th></tr></thead>
+          <tbody>
+            <tr><td>Horário</td><td class="sem">Horário comercial</td><td class="com">24 horas, todos os dias</td></tr>
+            <tr><td>Resposta</td><td class="sem">Quando alguém está livre</td><td class="com">Imediata, a qualquer hora</td></tr>
+            <tr><td>Follow-up</td><td class="sem">Quando sobra tempo</td><td class="com">Automático, no momento certo</td></tr>
+            <tr><td>Agendamento</td><td class="sem">Troca de mensagens até fechar</td><td class="com">Feito na própria conversa</td></tr>
+            <tr><td>Sua equipe</td><td class="sem">Presa no celular</td><td class="com">Livre para atender com cuidado</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="sc-copy copy copy--passos" data-sc-copy data-sc-window="0.645 0.805 0.2 0.25" aria-labelledby="t-passos">
+      <h2 id="t-passos">Da primeira conversa ao agente funcionando.</h2>
+      <div class="passos">
+        <div><h3>Entendimento e escopo</h3><p>Uma conversa para entender seu atendimento hoje e definir o que o agente vai fazer, e o que não vai.</p></div>
+        <div><h3>Desenvolvimento e testes</h3><p>Construímos o agente sob medida, integramos às suas ferramentas e testamos. <strong>Entrega em até 3 dias úteis.</strong></p></div>
+        <div><h3>7 dias de teste grátis</h3><p>Depois da entrega, o agente entra no seu WhatsApp e você testa por 7 dias, sem custo, antes de fechar.</p></div>
+        <div><h3>Acompanhamento contínuo</h3><p>Seguimos acompanhando os resultados, ajustando o agente e trazendo novas soluções para o seu negócio.</p></div>
+      </div>
+    </section>
+
+    <section class="sc-copy sc-copy--lead copy copy--fim" data-sc-copy data-sc-window="0.835 1 0.25 0" aria-labelledby="t-fim">
+      <h2 id="t-fim">Agora o telefone é o seu.</h2>
+      <p>A mensagem já está escrita. Quem responde é o nosso agente, no WhatsApp, agora. Depois da entrega, 7 dias de teste grátis.</p>
+      <p><a class="cta fone__cta" href="https://wa.me/5581996188781?text=Quero%20saber%20como%20funciona%20no%20meu%20neg%C3%B3cio" target="_blank" rel="noopener">Quero saber como funciona no meu negócio</a></p>
+      <footer class="rodape">
+        <span>© <span id="ano">2026</span> Automatize.AI</span>
+        <span>Tempo para o que é humano.</span>
+        <a href="https://instagram.com/auto.matizeai" target="_blank" rel="noopener">@auto.matizeai</a>
+        <span>Recife, PE</span>
+      </footer>
+    </section>
+
+    <!-- O telefone que você conduz. Não é [data-sc-copy]: o JS da página o move e o preenche. -->
+    <div class="fone" id="fone" aria-live="polite">
+      <div class="fone__corpo">
+        <div class="fone__tela">
+          <div class="fone__topo">
+            <div class="fone__avatar" id="fone-avatar"><span id="fone-ini" style="font:600 .8rem Inter;color:#07121E">C</span></div>
+            <div><div class="fone__nome" id="fone-nome">Clínica Sorriso (exemplo)</div><div class="fone__status" id="fone-status">Gestor de Atendimento · online</div></div>
+          </div>
+          <div class="fone__lista" id="fone-lista"></div>
+          <div class="fone__input">
+            <div class="fone__campo vazio" id="fone-campo">Mensagem</div>
+            <a class="fone__enviar" id="fone-enviar" href="https://wa.me/5581996188781?text=Quero%20saber%20como%20funciona%20no%20meu%20neg%C3%B3cio" target="_blank" rel="noopener" aria-label="Enviar no WhatsApp" tabindex="-1">
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3.4 20.4 21.9 12 3.4 3.6v6.5L16 12 3.4 13.9z"/></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+      <span class="fone__rotulo" id="fone-rotulo">Conversa ilustrativa</span>
+    </div>
+  </div>
+
+  <div data-sc-spacer aria-hidden="true"></div>
+</main>
+
+<script>
+  // Navegadores sem decodificador h264 (alguns Chromium no Linux) recebem as mesmas pernas em WebM/VP9.
+  (function () {
+    var v = document.createElement('video');
+    var h264 = v.canPlayType('video/mp4; codecs="avc1.42E01E"');
+    var forca = /[?&]codec=webm/.test(location.search);
+    if (h264 && !forca) return;
+    document.querySelectorAll('[data-sc-segment] video').forEach(function (el) {
+      ['data-sc-src', 'data-sc-src-mobile'].forEach(function (a) {
+        var s = el.getAttribute(a); if (s) el.setAttribute(a, s.replace(/\.mp4$/, '.webm'));
+      });
+    });
+  })();
+</script>
+<script src="scrollcraft.js"></script>
+<script>
+(function () {
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var voo = document.getElementById('inicio');
+  var segs = Array.prototype.map.call(voo.querySelectorAll('[data-sc-segment]'), function (s) { return parseFloat(s.getAttribute('data-sc-w')) || 1.3; });
+  var c0 = []; var total = 0; segs.forEach(function (w) { c0.push(total); total += w; });
+
+  // A api fica em window.__sc para os scripts de verificação da skill (worldflight-assert).
+  window.__sc = ScrollCraft.mount(document.body);
+
+  // O espaçador é dimensionado uma vez; um resize depois das fontes e do load mede de novo (worldflight.md §7b).
+  function relayout() { dispatchEvent(new Event('resize')); }
+  addEventListener('load', relayout);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(relayout);
+
+  // ---- o mapa ----------------------------------------------------------
+  var botoes = document.querySelectorAll('.rota button');
+  function topoDaPerna(i) {
+    var base = voo.getBoundingClientRect().top + scrollY;
+    return base + (c0[i] + (i === 0 ? 0 : 0.12)) * innerHeight;
+  }
+  botoes.forEach(function (b) {
+    b.addEventListener('click', function () {
+      scrollTo({ top: topoDaPerna(+b.getAttribute('data-perna')), behavior: reduce ? 'auto' : 'smooth' });
+    });
+  });
+  document.querySelector('.marca').addEventListener('click', function (e) { e.preventDefault(); scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' }); });
+  addEventListener('sc:waypoint', function (e) {
+    botoes.forEach(function (b) { b.setAttribute('aria-current', String(+b.getAttribute('data-perna') === e.detail.index)); });
+  });
+
+  // ---- o telefone que você conduz ----------------------------------------
+  var fone = document.getElementById('fone');
+  var lista = document.getElementById('fone-lista');
+  var campo = document.getElementById('fone-campo');
+  var enviar = document.getElementById('fone-enviar');
+  var nome = document.getElementById('fone-nome');
+  var status = document.getElementById('fone-status');
+  var avatar = document.getElementById('fone-avatar');
+
+  // Conversa ilustrativa (clínica odontológica). O texto é HTML de verdade.
+  var ROTEIRO = [
+    { em: 0, de: 'eles', t: 'Oi, boa tarde! Vocês têm horário pra limpeza essa semana?', h: '12:47' },
+    { em: 0.040, de: 'sistema', t: 'Recepção no almoço. Ninguém viu a mensagem.' },
+    { em: 0.075, de: 'nos', t: 'Boa tarde, Carla! Temos sim. Quinta às 15h ou sexta às 9h30. Qual prefere?', h: '12:47' },
+    { em: 0.110, de: 'eles', t: 'Sexta às 9h30, por favor.', h: '12:49' },
+    { em: 0.140, de: 'nos', t: 'Fechado: sexta, 16/10, às 9h30 com a Dra. Ana. Eu te lembro um dia antes.', h: '12:49' },
+    { em: 0.215, de: 'ok', t: 'Agendamento confirmado na agenda da clínica.' },
+    { em: 0.300, de: 'nos', t: 'Oi, Carla. Lembrete da sua limpeza amanhã às 9h30. Posso confirmar?', h: 'qui 08:00' },
+    { em: 0.340, de: 'eles', t: 'Confirmado!', h: 'qui 08:12' },
+    { em: 0.480, de: 'nos', t: 'Perfeito. Até amanhã. Se precisar remarcar, é só me dizer por aqui.', h: 'qui 08:12' },
+    { em: 0.680, de: 'ok', t: 'Paciente atendida, agendada e lembrada. Nenhuma mensagem perdida.' }
+  ];
+  var ROTEIRO_FIM = [
+    { em: 0.845, de: 'eles', t: 'Oi! Sou o agente da Automatize.AI. Me conta como é o atendimento no seu negócio hoje?', h: 'agora' }
+  ];
+  function msg(m) {
+    var el = document.createElement('div');
+    el.className = 'msg ' + (m.de === 'eles' ? 'msg--eles' : m.de === 'nos' ? 'msg--nos' : 'msg--sistema' + (m.de === 'ok' ? ' msg--ok' : ''));
+    el.textContent = m.t;
+    if (m.h) { var tm = document.createElement('time'); tm.textContent = m.h; el.appendChild(tm); }
+    return el;
+  }
+  var nosFim = false;
+  var mostrados = -1;
+  function montar(roteiro, ate) {
+    lista.innerHTML = '';
+    roteiro.forEach(function (m) { if (m.em <= ate) { var el = msg(m); lista.appendChild(el); requestAnimationFrame(function () { el.classList.add('on'); }); } });
+  }
+  function atualizarConversa(pr) {
+    var fim = pr >= 0.82;
+    if (fim !== nosFim) {
+      nosFim = fim; mostrados = -1;
+      nome.textContent = fim ? 'Automatize.AI' : 'Clínica Sorriso (exemplo)';
+      status.textContent = fim ? 'nosso agente · responde na hora' : 'Gestor de Atendimento · online';
+      avatar.innerHTML = fim ? '<img src="assets/simbolo.svg" alt="">' : '<span style="font:600 .8rem Inter;color:#07121E">C</span>';
+      document.getElementById('fone-rotulo').textContent = fim ? 'Esta conversa é real: abre o nosso WhatsApp' : 'Conversa ilustrativa';
+      fone.classList.toggle('ativo', fim);
+      enviar.setAttribute('tabindex', fim ? '0' : '-1');
+      if (fim) { campo.textContent = 'Quero saber como funciona no meu negócio'; campo.classList.remove('vazio'); }
+      else { campo.textContent = 'Mensagem'; campo.classList.add('vazio'); }
+    }
+    var rot = fim ? ROTEIRO_FIM : ROTEIRO;
+    var n = 0; rot.forEach(function (m) { if (m.em <= pr) n++; });
+    if (n !== mostrados) { mostrados = n; montar(rot, pr); }
+  }
+
+  // Posição do telefone por perna: [x em fração da largura, y em fração da altura, escala]
+  var mobile = matchMedia('(max-width: 860px)');
+  function alvo(pr) {
+    var m = mobile.matches;
+    var P = m
+      ? [[0.5, 0.36, 1], [0.78, 0.26, 0.5], [0.78, 0.26, 0.5], [0.78, 0.26, 0.5], [0.5, 0.36, 1]]
+      : [[0.74, 0.5, 1], [0.87, 0.24, 0.56], [0.87, 0.24, 0.56], [0.87, 0.24, 0.56], [0.72, 0.5, 1]];
+    // qual perna e quanto dentro dela
+    var t = pr * total, i = 0; while (i < c0.length - 1 && t >= c0[i + 1]) i++;
+    var local = (t - c0[i]) / segs[i];
+    var a = P[i], b = P[Math.min(i + 1, P.length - 1)];
+    // a troca de posição acontece nos últimos 22% de cada perna
+    var k = i === P.length - 1 ? 0 : Math.max(0, (local - 0.78) / 0.22); k = k * k * (3 - 2 * k);
+    return [a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k, a[2] + (b[2] - a[2]) * k];
+  }
+  var ultimo = '';
+  function pintar() {
+    var cs = getComputedStyle(document.documentElement);
+    var seg = parseInt(cs.getPropertyValue('--sc-seg')) || 0;
+    var segp = parseFloat(cs.getPropertyValue('--sc-segp')) || 0;
+    var pr = Math.min(1, (c0[seg] + segp * segs[seg]) / total);
+    var p = alvo(pr);
+    var fw = fone.offsetWidth, fh = fone.offsetHeight;
+    var x = p[0] * innerWidth - fw / 2, y = p[1] * innerHeight - fh / 2;
+    var tr = 'translate3d(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px,0) scale(' + p[2].toFixed(3) + ')';
+    if (tr !== ultimo) { fone.style.transform = tr; ultimo = tr; }
+    atualizarConversa(pr);
+    requestAnimationFrame(pintar);
+  }
+  requestAnimationFrame(pintar);
+
+  // ---- os números sobem uma vez, quando o bloco de resultados está legível ----
+  var contados = false;
+  var bloco = document.querySelector('.copy--resultados');
+  var fmt = function (v, dec) { return v.toLocaleString('pt-BR', { minimumFractionDigits: dec, maximumFractionDigits: dec }); };
+  function contar() {
+    document.querySelectorAll('[data-conta]').forEach(function (el) {
+      var alvoTxt = el.getAttribute('data-conta');
+      var dec = alvoTxt.indexOf(',') >= 0 ? 1 : 0;
+      var fimV = parseFloat(alvoTxt.replace(/\./g, '').replace(',', '.'));
+      if (reduce) { el.textContent = fmt(fimV, dec); return; }
+      var t0 = null;
+      function q(now) {
+        if (t0 === null) t0 = now;
+        var u = Math.min((now - t0) / 1400, 1); var e = 1 - Math.pow(1 - u, 3);
+        el.textContent = fmt(fimV * e, dec);
+        if (u < 1) requestAnimationFrame(q);
+      }
+      requestAnimationFrame(q);
+    });
+  }
+  (function vigiar() {
+    if (!contados && parseFloat(bloco.style.opacity || 0) > 0.5) { contados = true; contar(); return; }
+    requestAnimationFrame(vigiar);
+  })();
+
+  document.getElementById('ano').textContent = String(new Date().getFullYear());
+})();
+</script>
+</body>
+</html>
