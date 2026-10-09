@@ -108,6 +108,12 @@
   /* resultados: uma linha de quatro números, embaixo */
   .copy--resultados { inset-inline: var(--mapa) var(--sc-gutter); bottom: clamp(2.5rem, 9vh, 7rem); max-width: none; }
   .copy--resultados h2, .copy--passos h2 { max-width: 68%; }
+  .total { display: inline-flex; gap: clamp(1rem, 3vw, 2.5rem); margin-top: var(--sc-5); padding: 0.9rem 1.3rem; border-radius: var(--sc-r-lg);
+    background: rgba(255,255,255,0.88); box-shadow: var(--sc-e2), var(--sc-edge); }
+  .total > div { display: flex; align-items: baseline; gap: 0.6rem; }
+  .total > div + div { padding-left: clamp(1rem, 3vw, 2.5rem); border-left: 1px solid var(--sc-hairline-strong); }
+  .total b { font: 700 var(--sc-t-xl)/1 var(--sc-font-display); color: var(--marinho); letter-spacing: var(--sc-track-snug); white-space: nowrap; }
+  .total span { font-size: var(--sc-t-sm); color: var(--sc-ink-soft); }
   .numeros { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(1rem, 3vw, 3rem); margin-top: var(--sc-6); }
   .numeros > div { border-top: 1px solid var(--sc-hairline-strong); padding-top: var(--sc-4); }
   .numero { font: 700 var(--sc-t-2xl)/1 var(--sc-font-display); color: var(--oceano); letter-spacing: var(--sc-track-snug); font-variant-numeric: tabular-nums; white-space: nowrap; display: flex; flex-direction: column; justify-content: flex-end; min-height: 1.7em; }
@@ -237,6 +243,11 @@
     .numero { font-size: clamp(1.5rem, 6.5vw, 2rem); }
     .numeros .oque, .passos p { font-size: var(--sc-t-xs); }
     .numeros .quem { display: none; }
+    .total { display: flex; padding: 0.6rem 0.8rem; gap: 0.8rem; margin-top: var(--sc-3); }
+    .total > div { flex-direction: column; gap: 0.2rem; }
+    .total > div + div { padding-left: 0.8rem; }
+    .total b { font-size: var(--sc-t-lg); }
+    .total span { font-size: 0.68rem; line-height: 1.3; }
     .passos h3 { font-size: var(--sc-t-base); }
     .passos p { line-height: 1.4; }
     .copy--muda { max-width: none; inset-inline: var(--sc-gutter); left: auto; translate: none; width: auto; }
@@ -327,13 +338,17 @@
 
     <section class="sc-copy copy copy--resultados" data-sc-copy data-sc-window="0.20 0.43 0.2 0.25" aria-labelledby="t-res">
       <h2 id="t-res">Números de clientes que já usam o agente.</h2>
+      <div class="total" aria-label="Volume total atendido pelos nossos agentes">
+        <div><b>+4.800</b><span>leads atendidos pelos nossos agentes</span></div>
+        <div><b>+28 mil</b><span>mensagens respondidas</span></div>
+      </div>
       <div class="numeros">
         <div><span class="numero"><b data-conta="229">0</b></span><span class="oque">agendamentos nos primeiros quatro meses</span><span class="quem">Dra. Társila Gabrielle · odontologia · 1.046 leads atendidos</span></div>
-        <div><span class="numero"><small>11,7% →</small><b><span data-conta="23,1">0,0</span>%</b></span><span class="oque">de conversão em agendamento, do primeiro ao quinto mês</span><span class="quem">OdontoLuz · clínica odontológica</span></div>
+        <div><span class="numero"><small>11,7% →</small><b><span data-conta="23,1">0,0</span>%</b></span><span class="oque">de conversão em agendamento, do primeiro ao quinto mês com o agente</span><span class="quem">OdontoLuz · clínica odontológica</span></div>
         <div><span class="numero"><b><span data-conta="69">0</span>h50</b></span><span class="oque">de atendimento manual economizadas nos primeiros meses</span><span class="quem">Studio Joseli Machado · estúdio de beleza · 1.794 leads atendidos</span></div>
         <div><span class="numero"><b data-conta="1.199">0</b></span><span class="oque">encaminhamentos para a unidade certa nos primeiros meses</span><span class="quem">Academia X1 Fitness · rede com 4 unidades</span></div>
       </div>
-      <p class="miudo">Resultados dos primeiros meses de uso de cada cliente, divulgados com autorização. Mais de 4.800 leads atendidos no total.</p>
+      <p class="miudo">Resultados dos primeiros meses de uso de cada cliente, divulgados com autorização.</p>
     </section>
 
     <section class="sc-copy copy copy--muda" data-sc-copy data-sc-window="0.46 0.62 0.2 0.25" aria-labelledby="t-muda">
